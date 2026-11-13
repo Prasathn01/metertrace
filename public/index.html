@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MeterTrace – Old Meter Tracking Portal</title>
+<meta name="description" content="Tracks conventional electricity meters removed during the smart-meter rollout, from removal to registered recycler, and shows where meters go missing." />
+<meta name="theme-color" content="#0b2e59" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b2e59'/%3E%3Ccircle cx='16' cy='17' r='8' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cpath d='M16 17l4-5' stroke='%23f08a24' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+
+  <div class="utility no-print">
+    <div class="wrap utility-inner">
+      <span class="utility-left"><span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>E-waste accountability portal for the smart-meter rollout</span>
+      <span class="utility-right">
+        <span class="sr-only">Text size</span>
+        <button class="ts" data-ts="-1" aria-label="Smaller text">A−</button>
+        <button class="ts" data-ts="0" aria-label="Normal text">A</button>
+        <button class="ts" data-ts="1" aria-label="Larger text">A+</button>
+      </span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#/public" aria-label="MeterTrace home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="42" height="42"><rect width="40" height="40" rx="10" fill="#0b2e59"/><circle cx="20" cy="21.5" r="10" fill="none" stroke="#fff" stroke-width="3"/><path d="M20 21.5l5-6.5" stroke="#f08a24" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="21.5" r="2" fill="#fff"/></svg>
+        </span>
+        <span class="brand-text">
+          <b>MeterTrace</b>
+          <small>Old Electricity Meter Tracking Portal</small>
+        </span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="header-right" id="headerRight"></div>
+    </div>
+  </header>
+
+  <div class="demo-banner no-print"><span>Demonstration system.</span> Sample data only — names, figures and organisations are illustrative.</div>
+
+  <div class="shell" id="shell">
+    <nav class="sidenav no-print" id="tabs" aria-label="Sections"></nav>
+    <main id="main" tabindex="-1">
+      <div class="loading"><span class="spinner"></span>Loading…</div>
+    </main>
+  </div>
+
+  <footer class="site-footer no-print">
+    <div class="wrap footer-grid">
+      <div>
+        <b>MeterTrace</b>
+        <p>Tracks conventional electricity meters removed under the Revamped Distribution Sector Scheme (RDSS) from the consumer's premises to a registered recycler.</p>
+      </div>
+      <div>
+        <b>Portal</b>
+        <a href="#/public">Public dashboard</a>
+        <a href="#/public" data-scroll="how">How it works</a>
+        <a href="#/login">Official login</a>
+      </div>
+      <div>
+        <b>Integrity</b>
+        <span>Append-only records</span>
+        <span>SHA-256 hash chain</span>
+        <span>Role-based access</span>
+      </div>
+    </div>
+    <div class="wrap footer-bottom">Demonstration build · sample data · not an official government system</div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-back" id="modalBack" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head"><h3 id="modalTitle"></h3><button class="icon-x" id="modalClose" aria-label="Close">×</button></div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
