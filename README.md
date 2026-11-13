@@ -24,6 +24,7 @@ MeterTrace tracks every lot of removed meters from the consumer's premises to a 
 - **Data integrity:** records are append-only. PostgreSQL itself rejects UPDATE and DELETE, and corrections are new records linked to the original. Each record stores the SHA-256 hash of the previous one, and **Verify records** finds the first broken link. A demo button tampers with a record so the check can be shown.
 - **Roles:** Installer, Store Officer, Recycler and Regulator, each with their own dashboard, plus a public page with no login. The Regulator can create and deactivate user accounts.
 - **Dashboards:** totals, flow chart, unaccounted meters by state and division, lead-risk count, materials and ₹ scrap value, state ranking, and print-friendly reports for each role.
+- **Inside a meter (public page):** what electromechanical and electronic meters are made of (components, material shares, hazards such as lead solder and lithium batteries) and why each must reach a registered recycler.
 
 ## Stack (all free tier)
 
@@ -61,6 +62,8 @@ metertrace/
 ├── supabase/
 │   ├── functions/api/index.ts   Backend API (every endpoint, rule and calculation)
 │   └── schema.sql               Database: tables, hash chain, append-only triggers, security
+├── presentation/
+│   └── MeterTrace-Presentation.pptx   19-slide project presentation (with speaker notes)
 ├── vercel.json                  Hosting config: /api proxy, security headers
 ├── DEMO-NOTES.md                Demo logins and a 5-minute viva script
 └── README.md

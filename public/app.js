@@ -140,8 +140,9 @@
         <button class="btn ghost sm" id="logoutBtn">Log out</button>`;
       $("#logoutBtn").onclick = async () => { try { await api("/logout", {}); } catch (_) { /* ignore */ } clearSession(); setFlash("ok", "You have been logged out."); location.hash = "#/login"; };
     } else {
-      h.innerHTML = `<a class="nav-link ${view === "public" ? "active" : ""}" href="#/public">Public dashboard</a>
+      h.innerHTML = `<a class="nav-link nav-hide-md ${view === "public" ? "active" : ""}" href="#/public">Public dashboard</a>
         <a class="nav-link nav-hide-sm" href="#/public" data-scroll="how">How it works</a>
+        <a class="nav-link nav-hide-sm" href="#/public" data-scroll="meter">Inside a meter</a>
         <a class="btn sm" href="#/login">Official login</a>`;
     }
   }
@@ -377,6 +378,67 @@
     return [...m.values()];
   }
 
+  // ---------- INSIDE A METER (public education section) ----------
+  // Composition = share of meter weight (illustrative, same defaults as the Settings page). "Other" = steel, glass, aluminium, misc.
+  const METER_TYPES = [
+    {
+      key: "EM", name: "Electromechanical (induction) meter", era: "Older analogue meters with a spinning disc", weight: "about 1.8 kg",
+      how: "Current and voltage coils create magnetic fields that spin an aluminium disc. A gear train turns the number dials that show units (kWh) used.",
+      parts: [["Aluminium disc", "spins in proportion to the power drawn"], ["Voltage (shunt) coil", "many turns of thin copper wire"], ["Current (series) coil", "a few turns of thick copper wire"],
+        ["Braking magnet", "permanent magnet that steadies the disc speed"], ["Register & gear train", "brass/steel gears and number dials"], ["Frame, base & cover", "cast metal frame, Bakelite base, glass or plastic cover"], ["Terminal block", "brass terminals and screws for the wires"]],
+      mix: { copper: 12, brass: 5, plastic: 30, pcb: 0, battery: 0, hazardous: 0.5 },
+      risk: "Mostly metal: copper, brass and steel are valuable and easy to recycle. Few hazards.",
+    },
+    {
+      key: "E_PRE", name: "Electronic meter, made before 2004", era: "Early static meters with a circuit board", weight: "about 1.2 kg",
+      how: "Sensors measure current and voltage; a metering chip calculates energy and shows it on an LCD. No moving parts.",
+      parts: [["Printed circuit board (PCB)", "fibreglass board with copper tracks and chips"], ["Current sensor", "shunt resistor or small current transformer"], ["Metering IC & microcontroller", "calculates kWh and stores readings"],
+        ["LCD display", "shows the reading"], ["Backup battery", "small lithium cell for the clock and memory"], ["Power supply", "transformer or capacitor circuit"], ["Plastic case & terminal block", "polycarbonate or ABS body, brass terminals"]],
+      mix: { copper: 5, brass: 3, plastic: 50, pcb: 15, battery: 2, hazardous: 3 },
+      risk: "Solder from this period usually contains LEAD. Must go to a registered recycler — never reuse or informal scrap.",
+      lead: true,
+    },
+    {
+      key: "E_POST", name: "Electronic meter, 2004 or later", era: "Modern static meters (smart meters add a modem)", weight: "about 0.9 kg",
+      how: "Same principle as other electronic meters, with lead-free solder in most cases. Smart meters add a communication module and a relay for remote connect/disconnect.",
+      parts: [["PCB with metering SoC", "single chip that measures and calculates"], ["Shunt / current transformer", "measures current"], ["LCD & optical port", "display and a port for reading data"],
+        ["Lithium battery", "keeps the clock running during power cuts"], ["Communication module", "RF / GPRS / NB-IoT modem (smart meters)"], ["Relay", "switches supply on/off remotely (smart meters)"], ["Plastic case & terminal block", "flame-retardant plastic, brass terminals"]],
+      mix: { copper: 5, brass: 3, plastic: 55, pcb: 16, battery: 3, hazardous: 1 },
+      risk: "Lithium batteries can catch fire if crushed and must be removed first. Circuit boards contain recoverable copper, gold and silver.",
+    },
+  ];
+  const MIX_COLORS = { copper: "#c26a2d", brass: "#c9a227", plastic: "#5b8def", pcb: "#13804a", battery: "#7a3fb8", hazardous: "#b42318", other: "#a9b4c4" };
+  const MIX_LABEL = { copper: "Copper", brass: "Brass", plastic: "Plastic", pcb: "Circuit board", battery: "Battery", hazardous: "Hazardous", other: "Steel, glass & other" };
+  function meterSection() {
+    const bar = (mix) => {
+      const parts = Object.entries(mix).filter(([, v]) => v > 0);
+      const other = Math.max(0, 100 - parts.reduce((a, [, v]) => a + v, 0));
+      const all = [...parts, ["other", other]];
+      return `<div class="mix-bar" role="img" aria-label="Material share: ${all.map(([k, v]) => `${MIX_LABEL[k]} ${v}%`).join(", ")}">${all.map(([k, v]) => `<span style="width:${v}%;background:${MIX_COLORS[k]}" title="${MIX_LABEL[k]} ${v}%"></span>`).join("")}</div>
+        <div class="mix-legend">${all.map(([k, v]) => `<span><i style="background:${MIX_COLORS[k]}"></i>${MIX_LABEL[k]} ${v}%</span>`).join("")}</div>`;
+    };
+    return `<section class="section" id="meter">
+      <div class="section-head"><div><div class="eyebrow">Know what is being removed</div><h2>Inside an electricity meter</h2>
+        <p>An electricity meter measures the energy (kilowatt-hours, kWh) a home or shop uses. Three kinds are being removed in the smart-meter rollout. Here is what each is made of, and why it must reach a registered recycler.</p></div></div>
+      <div class="meters">${METER_TYPES.map((m) => `<article class="meter-card ${m.lead ? "lead" : ""}">
+        <div class="mc-head"><span class="mc-ic">${meterIcon(m.key)}</span><div><h3>${m.name}</h3><div class="muted">${m.era} · ${m.weight}</div></div></div>
+        <p class="mc-how">${m.how}</p>
+        <div class="mc-label">Main components</div>
+        <ul class="parts">${m.parts.map(([p, d]) => `<li><b>${p}</b><span>${d}</span></li>`).join("")}</ul>
+        <div class="mc-label">What it is made of <span class="muted">(share of weight, illustrative)</span></div>
+        ${bar(m.mix)}
+        <div class="mc-risk ${m.lead ? "bad" : ""}">${m.lead ? "⚠ " : ""}${m.risk}</div>
+      </article>`).join("")}</div>
+      <p class="muted" style="margin-top:10px">Material shares are illustrative values for this demonstration — verify before use. Regulators can edit them on the Settings page.</p>
+    </section>`;
+  }
+  function meterIcon(k) {
+    // simple line drawings: disc meter vs digital meter
+    return k === "EM"
+      ? `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="8" y="4" width="32" height="40" rx="5"/><rect x="14" y="10" width="20" height="8" rx="1.5"/><path d="M17 14h2M22 14h2M27 14h2"/><ellipse cx="24" cy="29" rx="10" ry="3.5"/><path d="M24 25.5v7"/><path d="M14 39h20"/></svg>`
+      : `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="8" y="4" width="32" height="40" rx="5"/><rect x="13" y="10" width="22" height="10" rx="1.5"/><path d="M17 15h3M22 15h3M27 15h4"/><rect x="15" y="25" width="18" height="10" rx="1.5"/><path d="M19 25v-2M24 25v-2M29 25v-2M19 37v-2M24 37v-2M29 37v-2"/><circle cx="35" cy="40" r="1.2" fill="currentColor"/></svg>`;
+  }
+
   // ---------- PUBLIC ----------
   async function renderPublic() {
     main.innerHTML = `<div class="loading"><span class="spinner"></span>Loading public dashboard…</div>`;
@@ -421,6 +483,8 @@
           <div class="check"><div class="ic" style="background:var(--ok-soft);color:var(--ok)">${svg("shield")}</div><div><h3>Records cannot be faked quietly</h3><p>Records are append-only and hash-chained. Any change made behind the scenes is detected by "Verify records".</p></div></div>
         </div>
       </section>
+
+      ${meterSection()}
 
       <section class="section" id="users">
         <div class="section-head"><div><div class="eyebrow">Portal at a glance</div><h2>Who uses MeterTrace</h2>
