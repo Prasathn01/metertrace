@@ -65,7 +65,6 @@ metertrace/
 ├── presentation/
 │   └── MeterTrace-Presentation.pptx   19-slide project presentation (with speaker notes)
 ├── vercel.json                  Hosting config: /api proxy, security headers
-├── DEMO-NOTES.md                Demo logins and a 5-minute viva script
 └── README.md
 ```
 
@@ -86,16 +85,9 @@ metertrace/
 | POST | `/api/settings` | Regulator: weights, material %, prices, thresholds |
 | POST | `/api/demo/reset`, `/api/demo/tamper`, `/api/demo/untamper` | signed-in (demo only) |
 
-## Demo logins
+## Trying it out
 
-All use password `demo123`, and they're shown on the login page:
-
-| Role | Email ID |
-|---|---|
-| Installer | installer@metertrace.demo |
-| DISCOM Store Officer | store@metertrace.demo |
-| Recycler | recycler@metertrace.demo |
-| Regulator | regulator@metertrace.demo |
+Open the [live portal](https://metertrace.vercel.app). The public dashboard needs no login. For the role dashboards, the login page offers sample accounts for each role. All data is sample data, and anyone signed in can restore it with **Reset demo data**.
 
 ## Run or deploy it yourself
 
